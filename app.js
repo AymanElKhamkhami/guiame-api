@@ -2,18 +2,21 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan'); //A package for logging requests in the terminal
 const bodyParser = require('body-parser');
-const mongo = require('mongodb');
-const assert = require('assert'); //A testing package in node.js
-
+//const mongo = require('mongodb');
+const mongoose = require('mongoose'); //ORM for mongodb
+//const assert = require('assert'); //A testing package in node.js
 
 //Routes to handle requests
-const productRoutes = require('./api/routes/products');
+const userRoutes = require('./api/routes/users');
+
+const connString = 'mongodb+srv://guiame-admin:' + process.env.MONGO_ATLAS_PW + '@guiame-db-kzxkt.mongodb.net/guiame?retryWrites=true';
+mongoose.connect(connString, { useNewUrlParser: true });
 
 app.use(morgan('dev'));
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use('/products', productRoutes);
+app.use('/users', userRoutes);
 
 
 //Handle errors for requests that passed the routers

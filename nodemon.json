@@ -1,0 +1,6 @@
+{
+    "env" : {
+        "MONGO_ATLAS_PW": "WyF1GHTB2YLMp0L7",
+        "MONGO_ATLAS_CLUSTER": "guiame-db"
+    }
+}
