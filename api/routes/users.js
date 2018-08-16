@@ -4,27 +4,6 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 
 
-
-// router.get('/', (req, res, next) => {
-//     res.status(200).json({
-//         message: 'Handling GET requests to /users'
-//     })
-// });
-
-// router.get('/:userId', (req, res, next) => {
-//     const id = req.params.userId;
-//     if (id === 'special') {
-//         res.status(200).json({
-//             message: 'You discovered a special ID a tarf dl khra'
-//         });
-//     } else {
-//         res.status(200).json({
-//             message: 'Your ID is ' + id
-//         });
-//     }
-// });
-
-
 router.get("/", (req, res, next) => {
     User.find()
         .exec()
@@ -70,7 +49,7 @@ router.get("/getbyid/:userId", (req, res, next) => {
 
 router.get("/getbyname/:name", (req, res, next) => {
     const name = req.params.name;
-    User.find({name: name})
+    User.find({ name: name })
         .exec()
         .then(doc => {
             console.log("From database", doc);
@@ -91,7 +70,7 @@ router.get("/getbyname/:name", (req, res, next) => {
 
 router.get("/:filter?", (req, res, next) => {
     const name = req.params.name;
-    User.find({name: name})
+    User.find({ name: name })
         .exec()
         .then(doc => {
             console.log("From database", doc);
@@ -139,17 +118,33 @@ router.post('/', (req, res, next) => {
 });
 
 
-// router.patch('/:userId', (req, res, next) => {
-//     res.status(200).json({
-//         message: 'Updated user'
-//     });
-// });
+router.post('/login/', (req, res, next) => {
+    let userData = req.body;
+
+    User.findOne({ email: userData.email }, (err, user) => {
+        if (err) {
+            console.log(error);
+            res.status(500).json({
+                error: err
+            });
+        } else {
+            if (!user) {
+                res.status(401).json({
+                    message: 'Invalid email'
+                });
+            } else {
+                if(user.password !== userData.password) {
+                    res.status(401).json({
+                        message: 'Invalid password'
+                    });
+                } else {
+                    res.status(200).json(user);
+                }
+            }
+        }
+    });
+});
 
 
-// router.delete('/:userId', (req, res, next) => {
-//     res.status(200).json({
-//         message: 'Deleted user'
-//     });
-// });
 
 module.exports = router;
