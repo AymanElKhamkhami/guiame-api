@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 
@@ -89,24 +90,25 @@ router.get("/:filter?", (req, res, next) => {
 });
 
 
-router.post('/', (req, res, next) => {
-    const user = new User({
-        _id: new mongoose.Types.ObjectId(),
-        username: req.body.username,
-        name: req.body.name,
-        surename: req.body.surename,
-        email: req.body.email,
-        age: req.body.age
-    });
+router.post('/register/', (req, res) => {
+    let userData = req.body;
+    const user = new User(userData
+        //{
+        // _id: new mongoose.Types.ObjectId(),
+        // username: userData.username,
+        // name: userData.name,
+        // surename: userData.surename,
+        // email: req.body.email,
+        // age: userData.age
+        //}
+    );
 
-    user
-        .save()
+    user.save(error, registeredUser)
         .then(result => {
             console.log(result);
-            res.status(201).json({
-                //message: 'Handling POST requests to /users',
-                createdUser: user
-            });
+            let payload = { subject: registeredUser._id };
+            let token = jwt.sign(payload, 'myStaticKey');
+            res.status(201).send({token});
         })
         .catch(err => {
             console.log(err);
@@ -118,31 +120,61 @@ router.post('/', (req, res, next) => {
 });
 
 
-router.post('/login/', (req, res, next) => {
+router.post('/login/', (req, res) => {
     let userData = req.body;
 
-    User.findOne({ email: userData.email }, (err, user) => {
-        if (err) {
-            console.log(error);
-            res.status(500).json({
-                error: err
+    // User.findOne({ email: userData.email }, (err, user) => {
+    //     if (err) {
+    //         console.log(error);
+    //         res.status(500).json({
+    //             error: err
+    //         });
+    //     } else {
+    //         if (!user) {
+    //             res.status(401).json({
+    //                 message: 'Invalid email'
+    //             });
+    //         } else {
+    //             if(user.password !== userData.password) {
+    //                 res.status(401).json({
+    //                     message: 'Invalid password'
+    //                 });
+    //             } else {
+    //                  let payload = { subject: user._id };
+    //                  let token = jwt.sign(payload, 'myStaticKey');
+    //                  res.status(200).send({token});
+    //                  res.status(200).json(user);
+    //             }
+    //         }
+    //     }
+    // });
+
+    const user = new User({
+        _id: new mongoose.Types.ObjectId(),
+        username: 'Aymankun',
+        name: 'Ayman',
+        surename: 'El Khamkhami',
+        email: 'ayman-khm@guiame.com',
+        password: 'kaka',
+        age: 28
+    });
+
+    if (user.email !== userData.email) {
+        res.status(401).json({
+            message: 'Invalid email'
+        });
+    } else {
+        if (user.password !== userData.password) {
+            res.status(401).json({
+                message: 'Invalid password'
             });
         } else {
-            if (!user) {
-                res.status(401).json({
-                    message: 'Invalid email'
-                });
-            } else {
-                if(user.password !== userData.password) {
-                    res.status(401).json({
-                        message: 'Invalid password'
-                    });
-                } else {
-                    res.status(200).json(user);
-                }
-            }
+            let payload = { subject: user._id };
+            let token = jwt.sign(payload, 'myStaticKey');
+            res.status(200).send({token});
         }
-    });
+    }
+
 });
 
 
