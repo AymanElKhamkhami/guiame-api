@@ -1,1 +1,1 @@
-# guiame-rest
+# guiame-api

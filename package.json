@@ -1,5 +1,5 @@
 {
-  "name": "guiame-rest",
+  "name": "guiame-api",
   "version": "1.0.0",
   "description": "Restful API for Guiame",
   "main": "index.js",
