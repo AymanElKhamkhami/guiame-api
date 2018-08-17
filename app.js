@@ -21,7 +21,6 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-//app.use(tokenMiddlware);
 app.use('/users', userRoutes);
 app.use('/products', productRoutes);
 
