@@ -14,7 +14,7 @@ const userRoutes = require('./api/routes/users');
 const productRoutes = require('./api/routes/products');
 
 const connString = 'mongodb+srv://guiame-admin:' + process.env.MONGO_ATLAS_PW + '@guiame-db-kzxkt.mongodb.net/guiame?retryWrites=true';
-//mongoose.connect(connString, { useNewUrlParser: true });
+mongoose.connect(connString, { useNewUrlParser: true });
 
 app.use(cors());
 app.use(morgan('dev'));

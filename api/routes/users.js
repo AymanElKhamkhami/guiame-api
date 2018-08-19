@@ -92,30 +92,54 @@ router.get("/:filter?", (req, res, next) => {
 
 router.post('/register/', (req, res) => {
     let userData = req.body;
-    const user = new User(userData
-        //{
-        // _id: new mongoose.Types.ObjectId(),
-        // username: userData.username,
-        // name: userData.name,
-        // surename: userData.surename,
-        // email: req.body.email,
-        // age: userData.age
-        //}
+    const newUser = new User(//userData
+        {
+            _id: new mongoose.Types.ObjectId(),
+            username: 'temp',//userData.username,
+            name: 'temp',//userData.name,
+            surename: 'temp',//userData.surename,
+            email: userData.email,
+            age: 28,//userData.age,
+            password: userData.password
+        }
     );
 
-    user.save(error, registeredUser)
-        .then(result => {
-            console.log(result);
-            let payload = { subject: registeredUser._id };
-            let token = jwt.sign(payload, 'myStaticKey');
-            res.status(201).send({token});
-        })
-        .catch(err => {
-            console.log(err);
+    User.findOne({ email: userData.email }, (err, existingUser) => {
+        if (err) {
+            console.log(error);
             res.status(500).json({
                 error: err
             });
-        });
+        } else {
+            if (existingUser) {
+                res.status(403).json({
+                    message: 'Existing email'
+                });
+            } else {
+                newUser.save( (err, registeredUser) => {
+                    if (err) {
+                        console.log(err);
+                        res.status(500).json({
+                            error: err
+                        });
+                    } else {
+                        let payload = { subject: registeredUser._id };
+                        let token = jwt.sign(payload, 'myStaticKey');
+                        let publicData = {
+                            username: registeredUser.username,
+                            name: registeredUser.name,
+                            surename: registeredUser.surename,
+                            email: registeredUser.email
+                        };
+                        res.status(200).json({
+                            token: token,
+                            userData: publicData
+                        });
+                    }
+                });
+            }
+        }
+    });
 
 });
 
@@ -123,57 +147,69 @@ router.post('/register/', (req, res) => {
 router.post('/login/', (req, res) => {
     let userData = req.body;
 
-    // User.findOne({ email: userData.email }, (err, user) => {
-    //     if (err) {
-    //         console.log(error);
-    //         res.status(500).json({
-    //             error: err
-    //         });
-    //     } else {
-    //         if (!user) {
-    //             res.status(401).json({
-    //                 message: 'Invalid email'
-    //             });
-    //         } else {
-    //             if(user.password !== userData.password) {
-    //                 res.status(401).json({
-    //                     message: 'Invalid password'
-    //                 });
-    //             } else {
-    //                  let payload = { subject: user._id };
-    //                  let token = jwt.sign(payload, 'myStaticKey');
-    //                  res.status(200).send({token});
-    //                  res.status(200).json(user);
-    //             }
-    //         }
-    //     }
-    // });
-
-    const user = new User({
-        _id: new mongoose.Types.ObjectId(),
-        username: 'Aymankun',
-        name: 'Ayman',
-        surename: 'El Khamkhami',
-        email: 'ayman-khm@guiame.com',
-        password: 'kaka',
-        age: 28
-    });
-
-    if (user.email !== userData.email) {
-        res.status(401).json({
-            message: 'Invalid email'
-        });
-    } else {
-        if (user.password !== userData.password) {
-            res.status(401).json({
-                message: 'Invalid password'
+    User.findOne({ email: userData.email }, (err, user) => {
+        if (err) {
+            console.log(err);
+            res.status(500).json({
+                error: err
             });
         } else {
-            let payload = { subject: user._id };
-            let token = jwt.sign(payload, 'myStaticKey');
-            res.status(200).send({token});
+            if (!user) {
+                res.status(401).json({
+                    message: 'Invalid email'
+                });
+            } else {
+                if (user.password !== userData.password) {
+                    res.status(401).json({
+                        message: 'Invalid password'
+                    });
+                } else {
+                    let payload = { subject: user._id };
+                    let token = jwt.sign(payload, 'myStaticKey');
+                    let publicData = {
+                        username: user.username,
+                        name: user.name,
+                        surename: user.surename,
+                        email: user.email
+                    };
+                    res.status(200).json({
+                        token: token,
+                        userData: publicData
+                    });
+                }
+            }
         }
-    }
+    });
+
+    // const user = new User({
+    //     _id: new mongoose.Types.ObjectId(),
+    //     username: 'Aymankun',
+    //     name: 'Ayman',
+    //     surename: 'El Khamkhami',
+    //     email: 'ayman-khm@guiame.com',
+    //     password: 'kaka',
+    //     age: 28
+    // });
+
+    // if (user.email !== userData.email) {
+    //     res.status(401).json({
+    //         message: 'Invalid email'
+    //     });
+    // } else {
+    //     if (user.password !== userData.password) {
+    //         res.status(401).json({
+    //             message: 'Invalid password'
+    //         });
+    //     } else {
+    //         let payload = { subject: user._id };
+    //         let token = jwt.sign(payload, 'myStaticKey');
+    //         let publicData = { username: user.username, name: user.name, surename: user.surename, email: user.email };
+    //         res.status(200).json({
+    //             token: token, 
+    //             userData: publicData
+    //         });
+    //     }
+    // }
 
 });
 
